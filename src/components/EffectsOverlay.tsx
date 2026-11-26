@@ -1,6 +1,7 @@
 import React from 'react';
 import {DirectorState} from '../config/timeline';
 import {easeOutBack, FONTS, lerp, PALETTE, remap, seededRandom} from '../utils/motion';
+import {geminiStarPath} from './Robot';
 
 export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
   const {
@@ -128,29 +129,46 @@ export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
             {'30 秒剪完，'.slice(0, line1Chars)}
           </text>
 
-          {/* Line 2: Opus 5.5 */}
+          {/* Line 2: Gemini + Sparkle */}
           {line2Progress > 0.01 && (
-            <g transform={`translate(0, 12) scale(${line2Progress})`}>
+            <g transform={`translate(-8, 12) scale(${line2Progress})`}>
+              <defs>
+                <linearGradient id="noteGeminiGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#4285F4" />
+                  <stop offset="55%" stopColor="#7C6AF6" />
+                  <stop offset="100%" stopColor="#C46EF4" />
+                </linearGradient>
+              </defs>
               <text
                 x="0"
                 y="0"
                 textAnchor="middle"
-                fill={PALETTE.ink}
-                fontSize="66"
+                fill="url(#noteGeminiGrad)"
+                stroke={PALETTE.ink}
+                strokeWidth="2.2"
+                paintOrder="stroke"
+                fontSize="68"
                 fontWeight="900"
                 fontFamily={FONTS.comic}
               >
-                Opus 5.5
+                Gemini
               </text>
+              <path
+                transform="translate(128, -32)"
+                d={geminiStarPath(18)}
+                fill="url(#noteGeminiGrad)"
+                stroke={PALETTE.ink}
+                strokeWidth="2.2"
+              />
             </g>
           )}
 
-          {/* Coral hand-drawn brush underline */}
+          {/* Gemini aurora hand-drawn brush underline */}
           {underlineProgress > 0.01 && (
             <path
               d="M -146 34 Q 0 18 148 30"
               fill="none"
-              stroke={PALETTE.robot}
+              stroke="url(#noteGeminiGrad)"
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray="300"
@@ -170,7 +188,7 @@ export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
               fontFamily={FONTS.hand}
               opacity={sigOpacity}
             >
-              — 小克 ✨
+              — Gemini ✨
             </text>
           )}
         </g>

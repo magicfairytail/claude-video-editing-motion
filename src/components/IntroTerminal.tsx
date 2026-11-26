@@ -20,9 +20,9 @@ export const IntroTerminal: React.FC<{state: DirectorState}> = ({state}) => {
 
   if (!showIntro && editorDrawProgress >= 1) return null;
 
-  const line1Full = 'const 剪辑软件 = 小克.写代码()';
+  const line1Full = 'const 剪辑软件 = Gemini.写代码()';
   const line2Full = '剪辑软件.画出(时间轴, 预览, 面板)';
-  const line3Full = '小克.钻进去()';
+  const line3Full = 'Gemini.钻进去()';
 
   const totalChars = line1Full.length + line2Full.length + line3Full.length;
   const shownChars = Math.floor(introTerminalProgress * totalChars);
@@ -124,7 +124,7 @@ export const IntroTerminal: React.FC<{state: DirectorState}> = ({state}) => {
             fontSize="16"
             fontFamily={FONTS.hand}
           >
-            小克.js — 终端
+            Gemini.js — 终端
           </text>
 
           {/* Code lines */}
@@ -146,8 +146,8 @@ export const IntroTerminal: React.FC<{state: DirectorState}> = ({state}) => {
             <tspan fill="#755CC2">{l1.slice(0, 6)}</tspan>
             <tspan fill="#429E8F">{l1.slice(6, 11)}</tspan>
             <tspan fill={PALETTE.ink}>{l1.slice(11, 13)}</tspan>
-            <tspan fill={PALETTE.robot}>{l1.slice(13, 15)}</tspan>
-            <tspan fill={PALETTE.ink}>{l1.slice(15)}</tspan>
+            <tspan fill={PALETTE.geminiBlue}>{l1.slice(13, 19)}</tspan>
+            <tspan fill={PALETTE.ink}>{l1.slice(19)}</tspan>
           </text>
 
           {/* Line 2 */}
@@ -162,20 +162,20 @@ export const IntroTerminal: React.FC<{state: DirectorState}> = ({state}) => {
           {/* Line 3 */}
           {l3 && (
             <text x="64" y="176" fontSize="26" fontWeight="700" fontFamily={FONTS.hand}>
-              <tspan fill={PALETTE.robot}>{l3.slice(0, 2)}</tspan>
-              <tspan fill={PALETTE.ink}>{l3.slice(2)}</tspan>
+              <tspan fill={PALETTE.geminiBlue}>{l3.slice(0, 6)}</tspan>
+              <tspan fill={PALETTE.ink}>{l3.slice(6)}</tspan>
             </text>
           )}
 
           {/* Blinking block cursor */}
           {cursorBlink && (
             <rect
-              x={l3 ? 64 + l3.length * 22 : l2 ? 64 + l2.length * 21 : 64 + l1.length * 21}
+              x={l3 ? 64 + l3.length * 19 : l2 ? 64 + l2.length * 21 : 64 + l1.length * 19}
               y={l3 ? 152 : l2 ? 106 : 60}
               width="12"
               height="28"
               rx="2"
-              fill={PALETTE.robot}
+              fill={PALETTE.geminiBlue}
             />
           )}
         </g>

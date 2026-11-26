@@ -153,7 +153,7 @@ export const EditorWorkspace: React.FC<{
 
         {/* Project filename */}
         <text x="128" y="38" fill={PALETTE.ink} fontSize="19" fontWeight="700" fontFamily={FONTS.hand}>
-          小克剪辑_最终版_打死不改(3).mp4
+          Gemini剪辑_最终版_打死不改(3).mp4
         </text>
 
         {/* Center Timecode Pill */}
@@ -258,7 +258,7 @@ export const EditorWorkspace: React.FC<{
                 {id: 'night' as const, name: '夜景.mp4', dur: '2.4s', x: 36, y: 112},
                 {id: 'ramen' as const, name: '拉面.mp4', dur: '4.6s', x: 158, y: 112},
                 {id: 'shiba' as const, name: '柴犬.mov', dur: '2.4s', x: 36, y: 202},
-                {id: 'disco' as const, name: '小克蹦迪.mp4', dur: '2.8s', x: 158, y: 202},
+                {id: 'disco' as const, name: 'Gemini蹦迪.mp4', dur: '2.8s', x: 158, y: 202},
               ].map((item) => (
                 <g key={item.id}>
                   {renderThumbnail(item.id, item.x, item.y, 110, 64, `asset-${item.id}`)}
@@ -590,9 +590,9 @@ export const EditorWorkspace: React.FC<{
           {placedClipsCount >= 4 && (
             <g transform={`translate(0, ${-beatPulse * 2})`}>
               {renderThumbnail('disco', 761 - cutShift, 502, 190, 70, 'tl-disco')}
-              <rect x={767 - cutShift} y="508" width="76" height="16" rx="5" fill="rgba(255,253,248,0.9)" />
-              <text x={805 - cutShift} y="520" textAnchor="middle" fill={PALETTE.ink} fontSize="11" fontWeight="700" fontFamily={FONTS.hand}>
-                小克蹦迪.mp4
+              <rect x={767 - cutShift} y="508" width="90" height="16" rx="5" fill="rgba(255,253,248,0.9)" />
+              <text x={812 - cutShift} y="520" textAnchor="middle" fill={PALETTE.ink} fontSize="11" fontWeight="700" fontFamily={FONTS.hand}>
+                Gemini蹦迪.mp4
               </text>
             </g>
           )}
@@ -607,7 +607,7 @@ export const EditorWorkspace: React.FC<{
             <g opacity={audioTrackOpacity}>
               <rect x="110" y="592" width="1026" height="44" rx="10" fill="#ECE9FB" stroke={PALETTE.ink} strokeWidth="2.2" />
               <text x="122" y="608" fill="#5D538A" fontSize="12" fontWeight="700" fontFamily={FONTS.hand}>
-                ♪ bgm_小克.wav
+                ♪ bgm_gemini.wav
               </text>
               {Array.from({length: 142}).map((_, idx) => {
                 const bx = 118 + idx * 7.1;

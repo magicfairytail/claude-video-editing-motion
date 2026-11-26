@@ -186,7 +186,7 @@ export function getDirectorState(frame: number): DirectorState {
     {id: 'night' as const, label: '夜景.mp4', duration: '2.4s', sx: 90, sy: 145, tx: 192, ty: 536, start: 68, end: 86},
     {id: 'ramen' as const, label: '拉面.mp4', duration: '4.6s', sx: 212, sy: 145, tx: 430, ty: 536, start: 86, end: 106},
     {id: 'shiba' as const, label: '柴犬.mov', duration: '2.4s', sx: 90, sy: 232, tx: 675, ty: 536, start: 106, end: 126},
-    {id: 'disco' as const, label: '小克蹦迪.mp4', duration: '2.8s', sx: 212, sy: 232, tx: 855, ty: 536, start: 126, end: 146},
+    {id: 'disco' as const, label: 'Gemini蹦迪.mp4', duration: '2.8s', sx: 212, sy: 232, tx: 855, ty: 536, start: 126, end: 146},
   ];
   let placedClipsCount = 0;
   let draggingClip: DraggingClip | null = null;

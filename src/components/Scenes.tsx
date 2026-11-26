@@ -1,6 +1,7 @@
 import React from 'react';
 import {SceneKind, TransitionKind} from '../config/timeline';
 import {FONTS, PALETTE, seededRandom} from '../utils/motion';
+import {geminiStarPath, MiniGeminiCharacter} from './Robot';
 
 interface SceneProps {
   kind: SceneKind;
@@ -400,43 +401,8 @@ const DiscoScene: React.FC<{frame: number; flashPct?: number}> = ({frame, flashP
         <rect x="-7" y="-10" width="7" height="7" fill="#FFFFFF" opacity="0.85" />
         <rect x="4" y="2" width="6" height="6" fill="#FFE66D" opacity="0.85" />
       </g>
-      {/* Dancing mini Xiaoke */}
-      <g transform={`translate(100, ${204 - bounce})`}>
-        {/* Left arm raised */}
-        <path
-          d={`M -30 -8 L ${-48} ${-26 + armWave * 0.5}`}
-          stroke={PALETTE.ink}
-          strokeWidth="11"
-          strokeLinecap="round"
-        />
-        <path
-          d={`M -30 -8 L ${-48} ${-26 + armWave * 0.5}`}
-          stroke={PALETTE.robot}
-          strokeWidth="6.5"
-          strokeLinecap="round"
-        />
-        {/* Right arm raised */}
-        <path
-          d={`M 30 -8 L ${48} ${-26 - armWave * 0.5}`}
-          stroke={PALETTE.ink}
-          strokeWidth="11"
-          strokeLinecap="round"
-        />
-        <path
-          d={`M 30 -8 L ${48} ${-26 - armWave * 0.5}`}
-          stroke={PALETTE.robot}
-          strokeWidth="6.5"
-          strokeLinecap="round"
-        />
-        {/* Legs */}
-        <rect x="-20" y="24" width="10" height="16" rx="3" fill={PALETTE.robotShade} stroke={PALETTE.ink} strokeWidth="2.4" />
-        <rect x="10" y="24" width="10" height="16" rx="3" fill={PALETTE.robotShade} stroke={PALETTE.ink} strokeWidth="2.4" />
-        {/* Boxy body */}
-        <rect x="-32" y="-22" width="64" height="50" rx="5" fill={PALETTE.robot} stroke={PALETTE.ink} strokeWidth="2.8" />
-        {/* Happy ^ ^ eyes */}
-        <path d="M -16 0 Q -11 -7 -6 0" fill="none" stroke={PALETTE.ink} strokeWidth="3" strokeLinecap="round" />
-        <path d="M 6 0 Q 11 -7 16 0" fill="none" stroke={PALETTE.ink} strokeWidth="3" strokeLinecap="round" />
-      </g>
+      {/* Dancing mini Gemini character */}
+      <MiniGeminiCharacter frame={frame} bounce={bounce} armWave={armWave} />
       {/* Sparkles scaled by flashPct */}
       {flashPct > 5 &&
         [
@@ -640,9 +606,15 @@ export const PhoneScreenView: React.FC<{
         <g>
           {/* Right action column */}
           <g transform="translate(174, 108)">
-            <circle cx="0" cy="0" r="14" fill={PALETTE.robot} stroke="#FFFFFF" strokeWidth="2.2" />
-            <rect x="-5" y="-5" width="3" height="6" rx="1" fill={PALETTE.ink} />
-            <rect x="2" y="-5" width="3" height="6" rx="1" fill={PALETTE.ink} />
+            <defs>
+              <linearGradient id="avatarGeminiGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#65D6FA" />
+                <stop offset="50%" stopColor="#5584F7" />
+                <stop offset="100%" stopColor="#9B6DF7" />
+              </linearGradient>
+            </defs>
+            <circle cx="0" cy="0" r="14" fill="url(#avatarGeminiGrad)" stroke="#FFFFFF" strokeWidth="2.2" />
+            <path transform="translate(0, -1)" d={geminiStarPath(8)} fill="#FFFFFF" />
             <circle cx="0" cy="13" r="5" fill="#FF4B6E" />
             <text x="0" y="16" textAnchor="middle" fill="#FFFFFF" fontSize="9" fontWeight="900">
               +
@@ -694,7 +666,7 @@ export const PhoneScreenView: React.FC<{
               fontWeight="800"
               fontFamily={FONTS.hand}
             >
-              @小克 · Opus 5.5
+              @Gemini · Gemini Pro
             </text>
             <text
               x="0"
@@ -707,7 +679,7 @@ export const PhoneScreenView: React.FC<{
               fontWeight="700"
               fontFamily={FONTS.hand}
             >
-              #AI剪辑 #卡点 #code2video
+              #Gemini剪辑 #卡点 #code2video
             </text>
           </g>
         </g>
