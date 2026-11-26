@@ -13,9 +13,10 @@ export const VideoEditingMotion: React.FC = () => {
   const {camera, endingProgress} = state;
 
   const isEndingShowcase = endingProgress > 0.01;
-  const phoneX = lerp(640, 616, endingProgress);
-  const phoneY = lerp(216, 360, endingProgress);
-  const phoneScale = lerp(1, 1.54, endingProgress);
+  // Smoothly scale hero phone up to vertical showcase centerpiece above sticky note
+  const phoneX = 540;
+  const phoneY = lerp(424, 650, endingProgress);
+  const phoneScale = lerp(1.86, 3.05, endingProgress);
 
   return (
     <AbsoluteFill style={{backgroundColor: PALETTE.paper}}>
@@ -27,10 +28,9 @@ export const VideoEditingMotion: React.FC = () => {
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         style={{display: 'block'}}
       >
-        {/* Warm paper background */}
         <rect x="0" y="0" width={WIDTH} height={HEIGHT} fill={PALETTE.paper} />
 
-        {/* Camera-controlled Editor Stage */}
+        {/* Camera-controlled 9:16 Vertical Editor Stage */}
         <g
           transform={`translate(${WIDTH / 2 + camera.tx}, ${HEIGHT / 2 + camera.ty}) scale(${camera.scale}) translate(${-WIDTH / 2}, ${-HEIGHT / 2})`}
         >
@@ -39,7 +39,7 @@ export const VideoEditingMotion: React.FC = () => {
           {!isEndingShowcase && <RobotCharacter state={state} />}
         </g>
 
-        {/* Ending Showcase Foreground Layer (unscaled crisp phone, sticky note, celebrating robot) */}
+        {/* Ending Vertical Showcase Foreground */}
         {isEndingShowcase && (
           <g>
             <PhoneFrame state={state} x={phoneX} y={phoneY} scale={phoneScale} />

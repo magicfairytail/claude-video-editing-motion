@@ -7,7 +7,7 @@ const PencilIcon: React.FC<{x: number; y: number; angle?: number}> = ({
   y,
   angle = -38,
 }) => (
-  <g transform={`translate(${x}, ${y}) rotate(${angle})`}>
+  <g transform={`translate(${x}, ${y}) rotate(${angle}) scale(1.35)`}>
     <polygon points="0,0 10,-5 10,5" fill="#F2D7B6" stroke={PALETTE.ink} strokeWidth="1.8" />
     <polygon points="0,0 4,-2 4,2" fill={PALETTE.ink} />
     <rect x="10" y="-5" width="32" height="10" fill="#F1C64E" stroke={PALETTE.ink} strokeWidth="1.8" />
@@ -39,48 +39,48 @@ export const IntroTerminal: React.FC<{state: DirectorState}> = ({state}) => {
 
   const cursorBlink = Math.floor(frame / 4) % 2 === 0;
 
-  // Zip terminal to top-left while editor frame draws around the canvas
-  const termScale = lerp(1, 0.45, introZipProgress);
-  const termX = lerp(640, 220, introZipProgress);
-  const termY = lerp(360, 48, introZipProgress);
+  // Center on 1080x1920 vertical canvas and zip upward as vertical frame draws
+  const termScale = lerp(1.18, 0.5, introZipProgress);
+  const termX = lerp(540, 260, introZipProgress);
+  const termY = lerp(920, 120, introZipProgress);
   const termOpacity = introZipProgress > 0.72 ? lerp(1, 0, (introZipProgress - 0.72) / 0.28) : 1;
 
-  // Outer perimeter progress for pencil trace
-  const perimeter = 2 * (1252 + 704);
+  // Vertical outer frame rect: x=24, y=24, w=1032, h=1872
+  const fw = 1032;
+  const fh = 1872;
+  const perimeter = 2 * (fw + fh);
   const dashOffset = perimeter * (1 - editorDrawProgress);
 
-  // Pencil position traveling clockwise along the outer rect
-  let pencilX = 14;
-  let pencilY = 8;
+  let pencilX = 24;
+  let pencilY = 24;
   const dist = editorDrawProgress * perimeter;
-  if (dist < 1252) {
-    pencilX = 14 + dist;
-    pencilY = 8;
-  } else if (dist < 1252 + 704) {
-    pencilX = 1266;
-    pencilY = 8 + (dist - 1252);
-  } else if (dist < 2 * 1252 + 704) {
-    pencilX = 1266 - (dist - 1252 - 704);
-    pencilY = 712;
+  if (dist < fw) {
+    pencilX = 24 + dist;
+    pencilY = 24;
+  } else if (dist < fw + fh) {
+    pencilX = 24 + fw;
+    pencilY = 24 + (dist - fw);
+  } else if (dist < 2 * fw + fh) {
+    pencilX = 24 + fw - (dist - fw - fh);
+    pencilY = 24 + fh;
   } else {
-    pencilX = 14;
-    pencilY = 712 - (dist - 2 * 1252 - 704);
+    pencilX = 24;
+    pencilY = 24 + fh - (dist - 2 * fw - fh);
   }
 
   return (
     <g>
-      {/* Animated outer frame sketch trace */}
       {editorDrawProgress > 0 && editorDrawProgress < 1 && (
         <g>
           <rect
-            x="14"
-            y="8"
-            width="1252"
-            height="704"
-            rx="18"
+            x="24"
+            y="24"
+            width={fw}
+            height={fh}
+            rx="28"
             fill="none"
             stroke={PALETTE.ink}
-            strokeWidth="3.5"
+            strokeWidth="4.2"
             strokeDasharray={perimeter}
             strokeDashoffset={dashOffset}
           />
@@ -88,61 +88,56 @@ export const IntroTerminal: React.FC<{state: DirectorState}> = ({state}) => {
         </g>
       )}
 
-      {/* Terminal card */}
       {termOpacity > 0.01 && (
         <g
-          transform={`translate(${termX}, ${termY}) scale(${termScale}) translate(-330, -108)`}
+          transform={`translate(${termX}, ${termY}) scale(${termScale}) translate(-350, -120)`}
           opacity={termOpacity}
         >
-          {/* Soft drop shadow */}
-          <rect x="6" y="8" width="660" height="216" rx="14" fill="rgba(43,37,35,0.08)" />
+          <rect x="8" y="10" width="700" height="240" rx="18" fill="rgba(43,37,35,0.09)" />
           <rect
             x="0"
             y="0"
-            width="660"
-            height="216"
-            rx="14"
+            width="700"
+            height="240"
+            rx="18"
             fill={PALETTE.paperCard}
             stroke={PALETTE.ink}
-            strokeWidth="3"
+            strokeWidth="3.2"
           />
-          {/* Title bar */}
           <path
-            d="M 0 14 Q 0 0 14 0 L 646 0 Q 660 0 660 14 L 660 36 L 0 36 Z"
+            d="M 0 18 Q 0 0 18 0 L 682 0 Q 700 0 700 18 L 700 42 L 0 42 Z"
             fill="#EFE9DD"
             stroke={PALETTE.ink}
-            strokeWidth="2.4"
+            strokeWidth="2.6"
           />
-          <circle cx="24" cy="18" r="6" fill="#E55A52" stroke={PALETTE.ink} strokeWidth="1.8" />
-          <circle cx="44" cy="18" r="6" fill="#F1C64E" stroke={PALETTE.ink} strokeWidth="1.8" />
-          <circle cx="64" cy="18" r="6" fill="#72B97C" stroke={PALETTE.ink} strokeWidth="1.8" />
+          <circle cx="28" cy="21" r="7" fill="#E55A52" stroke={PALETTE.ink} strokeWidth="2" />
+          <circle cx="52" cy="21" r="7" fill="#F1C64E" stroke={PALETTE.ink} strokeWidth="2" />
+          <circle cx="76" cy="21" r="7" fill="#72B97C" stroke={PALETTE.ink} strokeWidth="2" />
           <text
-            x="330"
-            y="24"
+            x="350"
+            y="28"
             textAnchor="middle"
             fill={PALETTE.inkMuted}
-            fontSize="16"
+            fontSize="19"
             fontFamily={FONTS.hand}
           >
             Gemini.js — 终端
           </text>
 
-          {/* Code lines */}
           {[1, 2, 3].map((num, idx) => (
             <text
               key={num}
-              x="24"
-              y={84 + idx * 46}
+              x="28"
+              y={96 + idx * 52}
               fill="#B3ABA2"
-              fontSize="20"
+              fontSize="22"
               fontFamily={FONTS.mono}
             >
               {num}
             </text>
           ))}
 
-          {/* Line 1 syntax highlighted */}
-          <text x="64" y="84" fontSize="26" fontWeight="700" fontFamily={FONTS.hand}>
+          <text x="72" y="96" fontSize="29" fontWeight="700" fontFamily={FONTS.hand}>
             <tspan fill="#755CC2">{l1.slice(0, 6)}</tspan>
             <tspan fill="#429E8F">{l1.slice(6, 11)}</tspan>
             <tspan fill={PALETTE.ink}>{l1.slice(11, 13)}</tspan>
@@ -150,30 +145,27 @@ export const IntroTerminal: React.FC<{state: DirectorState}> = ({state}) => {
             <tspan fill={PALETTE.ink}>{l1.slice(19)}</tspan>
           </text>
 
-          {/* Line 2 */}
           {l2 && (
-            <text x="64" y="130" fontSize="26" fontWeight="700" fontFamily={FONTS.hand}>
+            <text x="72" y="148" fontSize="29" fontWeight="700" fontFamily={FONTS.hand}>
               <tspan fill="#429E8F">{l2.slice(0, 4)}</tspan>
               <tspan fill={PALETTE.ink}>{l2.slice(4, 8)}</tspan>
               <tspan fill="#C98A2E">{l2.slice(8)}</tspan>
             </text>
           )}
 
-          {/* Line 3 */}
           {l3 && (
-            <text x="64" y="176" fontSize="26" fontWeight="700" fontFamily={FONTS.hand}>
+            <text x="72" y="200" fontSize="29" fontWeight="700" fontFamily={FONTS.hand}>
               <tspan fill={PALETTE.geminiBlue}>{l3.slice(0, 6)}</tspan>
               <tspan fill={PALETTE.ink}>{l3.slice(6)}</tspan>
             </text>
           )}
 
-          {/* Blinking block cursor */}
           {cursorBlink && (
             <rect
-              x={l3 ? 64 + l3.length * 19 : l2 ? 64 + l2.length * 21 : 64 + l1.length * 19}
-              y={l3 ? 152 : l2 ? 106 : 60}
-              width="12"
-              height="28"
+              x={l3 ? 72 + l3.length * 21 : l2 ? 72 + l2.length * 23 : 72 + l1.length * 21}
+              y={l3 ? 172 : l2 ? 120 : 68}
+              width="13"
+              height="32"
               rx="2"
               fill={PALETTE.geminiBlue}
             />

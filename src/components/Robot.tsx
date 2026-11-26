@@ -1,6 +1,6 @@
 import React from 'react';
 import {DirectorState} from '../config/timeline';
-import {buildArmPath, FONTS, PALETTE} from '../utils/motion';
+import {buildArmPath, clamp, FONTS, lerp, PALETTE} from '../utils/motion';
 
 /** Reusable 4-point Gemini sparkle path centered at (0,0) */
 export function geminiStarPath(r: number, innerRatio = 0.28): string {
@@ -8,7 +8,7 @@ export function geminiStarPath(r: number, innerRatio = 0.28): string {
   return `M 0 ${-r} Q ${ir * 0.4} ${-ir * 0.4} ${r} 0 Q ${ir * 0.4} ${ir * 0.4} 0 ${r} Q ${-ir * 0.4} ${ir * 0.4} ${-r} 0 Q ${-ir * 0.4} ${-ir * 0.4} 0 ${-r} Z`;
 }
 
-/** Mini Gemini sprite used in DiscoScene and Avatar */
+/** Mini Gemini sprite used in DiscoScene */
 export const MiniGeminiCharacter: React.FC<{
   frame: number;
   bounce?: number;
@@ -30,7 +30,6 @@ export const MiniGeminiCharacter: React.FC<{
         </linearGradient>
       </defs>
 
-      {/* Left arm raised */}
       <path
         d={`M -28 -4 L ${-48} ${-24 + armWave * 0.5}`}
         stroke={PALETTE.ink}
@@ -43,7 +42,6 @@ export const MiniGeminiCharacter: React.FC<{
         strokeWidth="6.5"
         strokeLinecap="round"
       />
-      {/* Right arm raised */}
       <path
         d={`M 28 -4 L ${48} ${-24 - armWave * 0.5}`}
         stroke={PALETTE.ink}
@@ -57,11 +55,9 @@ export const MiniGeminiCharacter: React.FC<{
         strokeLinecap="round"
       />
 
-      {/* Legs */}
       <rect x="-18" y="23" width="10" height="15" rx="5" fill="#465BC8" stroke={PALETTE.ink} strokeWidth="2.4" />
       <rect x="8" y="23" width="10" height="15" rx="5" fill="#465BC8" stroke={PALETTE.ink} strokeWidth="2.4" />
 
-      {/* Floating Gemini 4-point star antenna */}
       <line x1="0" y1="-26" x2="0" y2={-35 + starBob} stroke={PALETTE.ink} strokeWidth="2.2" strokeLinecap="round" />
       <path
         transform={`translate(0, ${-43 + starBob})`}
@@ -72,7 +68,6 @@ export const MiniGeminiCharacter: React.FC<{
         strokeLinejoin="round"
       />
 
-      {/* Rounded pillow-star torso */}
       <rect
         x="-31"
         y="-25"
@@ -83,15 +78,11 @@ export const MiniGeminiCharacter: React.FC<{
         stroke={PALETTE.ink}
         strokeWidth="2.8"
       />
-      {/* Top specular highlight */}
       <ellipse cx="-10" cy="-14" rx="12" ry="4.5" fill="#FFFFFF" opacity="0.35" transform="rotate(-12 -10 -14)" />
-      {/* Mini chest sparkle */}
       <path transform="translate(0, 14)" d={geminiStarPath(5.5)} fill="#FFFFFF" opacity="0.88" />
 
-      {/* Happy ^ ^ eyes */}
       <path d="M -16 -2 Q -11 -9 -6 -2" fill="none" stroke={PALETTE.ink} strokeWidth="3" strokeLinecap="round" />
       <path d="M 6 -2 Q 11 -9 16 -2" fill="none" stroke={PALETTE.ink} strokeWidth="3" strokeLinecap="round" />
-      {/* Rosy cheeks */}
       <ellipse cx="-20" cy="6" rx="5" ry="3" fill="#FFA6D5" opacity="0.75" />
       <ellipse cx="20" cy="6" rx="5" ry="3" fill="#FFA6D5" opacity="0.75" />
     </g>
@@ -107,7 +98,8 @@ export const RobotCharacter: React.FC<{state: DirectorState}> = ({state}) => {
     robotScaleX: sx,
     robotScaleY: sy,
     robotExpression: expr,
-    robotSunglasses: shades,
+    sunglassesMode,
+    sunglassesProgress,
     robotDust: dust,
     robotSpeech: speech,
     robotArm: arm,
@@ -165,7 +157,6 @@ export const RobotCharacter: React.FC<{state: DirectorState}> = ({state}) => {
           <g>
             <rect x="-17" y="-11" width="7.5" height="15" rx="3.75" fill={PALETTE.ink} />
             <rect x="9.5" y="-11" width="7.5" height="15" rx="3.75" fill={PALETTE.ink} />
-            {/* Star-shaped catchlights inside eyes */}
             <path transform="translate(-14.5, -7)" d={geminiStarPath(2.8)} fill="#FFFFFF" />
             <path transform="translate(12, -7)" d={geminiStarPath(2.8)} fill="#FFFFFF" />
             <ellipse cx="-24" cy="7" rx="5.5" ry="3.2" fill="#FFA6D5" opacity="0.6" />
@@ -175,8 +166,40 @@ export const RobotCharacter: React.FC<{state: DirectorState}> = ({state}) => {
     }
   };
 
-  const armOriginX = arm ? x + (arm.side === 'left' ? -36 : 36) : x;
-  const armOriginY = y - 2;
+  // Compute animated sunglasses transform (placed directly over EYES at y=-4!)
+  const hasSunglasses = sunglassesMode !== 'hidden';
+  let glassesX = 0;
+  let glassesY = -4;
+  let glassesRot = 0;
+  let glassesOpacity = 1;
+  let leftHandHoldingGlasses = false;
+
+  if (sunglassesMode === 'puttingOn') {
+    const t = clamp(sunglassesProgress, 0, 1.15);
+    glassesX = lerp(-46, 0, Math.min(1, t));
+    glassesY = lerp(-32, -4, t);
+    glassesRot = lerp(-26, 0, Math.min(1, t));
+    glassesOpacity = clamp(sunglassesProgress * 3.5, 0, 1);
+    leftHandHoldingGlasses = true;
+  } else if (sunglassesMode === 'wearing') {
+    glassesX = 0;
+    glassesY = -4;
+    glassesRot = 0;
+    glassesOpacity = 1;
+  } else if (sunglassesMode === 'takingOff') {
+    const t = clamp(sunglassesProgress, 0, 1);
+    glassesX = lerp(0, -52, t);
+    glassesY = lerp(-4, -30, t);
+    glassesRot = lerp(0, -30, t);
+    glassesOpacity = t > 0.7 ? lerp(1, 0, (t - 0.7) / 0.3) : 1;
+    leftHandHoldingGlasses = true;
+  }
+
+  // Animated glint sweep across dark lenses while wearing
+  const glintShift = ((frame * 3.5) % 44) - 18;
+
+  const armOriginX = arm ? x + (arm.side === 'left' ? -36 * sx : 36 * sx) : x;
+  const armOriginY = y - 2 * sy;
   const armPath = arm
     ? buildArmPath(armOriginX, armOriginY, arm.targetX, arm.targetY, arm.sag ?? 18)
     : '';
@@ -202,9 +225,9 @@ export const RobotCharacter: React.FC<{state: DirectorState}> = ({state}) => {
         </linearGradient>
       </defs>
 
-      {/* Giant Ctrl+Z keycap underneath character */}
+      {/* Giant Ctrl+Z keycap underneath character (9:16 position) */}
       {showCtrlZ && (
-        <g transform={`translate(355, ${616 + ctrlZPress * 10})`}>
+        <g transform={`translate(360, ${1732 + ctrlZPress * 14}) scale(1.22)`}>
           <rect x="-92" y="-36" width="184" height="94" rx="18" fill="#D5CEC2" stroke={PALETTE.ink} strokeWidth="3.5" />
           <rect x="-86" y="-44" width="172" height="82" rx="15" fill="#FFFDF8" stroke={PALETTE.ink} strokeWidth="3.2" />
           <text
@@ -228,28 +251,28 @@ export const RobotCharacter: React.FC<{state: DirectorState}> = ({state}) => {
             d={armPath}
             fill="none"
             stroke={PALETTE.ink}
-            strokeWidth="15"
+            strokeWidth="18"
             strokeLinecap="round"
           />
           <path
             d={armPath}
             fill="none"
             stroke="url(#geminiArmGrad)"
-            strokeWidth="9.5"
+            strokeWidth="11.5"
             strokeLinecap="round"
           />
           {arm.tool === 'hand' && (
             <circle
               cx={arm.targetX}
               cy={arm.targetY}
-              r="9.5"
+              r="12"
               fill="#7CC5FF"
               stroke={PALETTE.ink}
-              strokeWidth="2.8"
+              strokeWidth="3.2"
             />
           )}
           {arm.tool === 'knife' && (
-            <g transform={`translate(${arm.targetX}, ${arm.targetY}) rotate(-32)`}>
+            <g transform={`translate(${arm.targetX}, ${arm.targetY}) rotate(-32) scale(1.25)`}>
               <rect x="-12" y="-7" width="24" height="14" rx="4" fill="#F1C64E" stroke={PALETTE.ink} strokeWidth="2.5" />
               <polygon points="12,-5 38,-5 44,5 12,5" fill="#F2F6FA" stroke={PALETTE.ink} strokeWidth="2.2" />
             </g>
@@ -273,17 +296,17 @@ export const RobotCharacter: React.FC<{state: DirectorState}> = ({state}) => {
         <rect x="-24" y="24" width="12" height="18" rx="6" fill="#445AC6" stroke={PALETTE.ink} strokeWidth="2.8" />
         <rect x="12" y="24" width="12" height="18" rx="6" fill="#445AC6" stroke={PALETTE.ink} strokeWidth="2.8" />
 
-        {/* Left stubby arm */}
-        {(!arm || arm.side !== 'left') && (
+        {/* Left stubby arm (hidden when stretched OR when lifting sunglasses) */}
+        {(!arm || arm.side !== 'left') && !leftHandHoldingGlasses && (
           <rect x="-48" y="-3" width="15" height="12" rx="6" fill="#63A8FA" stroke={PALETTE.ink} strokeWidth="2.8" />
         )}
+
         {/* Right stubby arm (or waving in ending) */}
         {(!arm || arm.side !== 'right') &&
           (waveEnding ? (
             <g transform={`translate(35, 1) rotate(${-38 + Math.sin(frame * 0.4) * 16})`}>
               <rect x="0" y="-6" width="28" height="12" rx="6" fill="#8D71F7" stroke={PALETTE.ink} strokeWidth="2.8" />
               <circle cx="28" cy="0" r="7.5" fill="#7CC5FF" stroke={PALETTE.ink} strokeWidth="2.6" />
-              {/* Tiny sparkle next to waving hand */}
               <path
                 transform="translate(38, -16)"
                 d={geminiStarPath(6.5)}
@@ -297,7 +320,7 @@ export const RobotCharacter: React.FC<{state: DirectorState}> = ({state}) => {
           ))}
 
         {/* Floating Gemini 4-point Star Antenna / Crest */}
-        <g transform={`translate(0, ${shades ? -6 : 0})`}>
+        <g>
           <line x1="0" y1="-29" x2="0" y2={-38 + starFloat * 0.5} stroke={PALETTE.ink} strokeWidth="2.6" strokeLinecap="round" />
           <g transform={`translate(0, ${-49 + starFloat}) rotate(${starSpin})`}>
             <path
@@ -322,7 +345,7 @@ export const RobotCharacter: React.FC<{state: DirectorState}> = ({state}) => {
           strokeWidth="3.2"
         />
 
-        {/* Soft white glossy highlight on top-left */}
+        {/* Glossy highlight & bottom rim shade */}
         <ellipse
           cx="-14"
           cy="-18"
@@ -332,7 +355,6 @@ export const RobotCharacter: React.FC<{state: DirectorState}> = ({state}) => {
           opacity="0.38"
           transform="rotate(-14 -14 -18)"
         />
-        {/* Subtle bottom indigo rim shade */}
         <path
           d="M -28 21 Q 0 28 28 21"
           fill="none"
@@ -342,20 +364,75 @@ export const RobotCharacter: React.FC<{state: DirectorState}> = ({state}) => {
           opacity="0.38"
         />
 
-        {/* Small white Gemini star emblem on lower belly */}
+        {/* Small white Gemini star emblem on belly */}
         <path transform="translate(0, 16)" d={geminiStarPath(6.2)} fill="#FFFFFF" opacity="0.92" />
 
         {/* Expressive Eyes */}
         {renderEyes()}
 
-        {/* Cool Sunglasses perched on forehead */}
-        {shades && (
-          <g transform="translate(0, -28) rotate(-4)">
-            <rect x="-26" y="-6" width="22" height="12" rx="4" fill="#231F20" stroke={PALETTE.ink} strokeWidth="2" />
-            <rect x="4" y="-6" width="22" height="12" rx="4" fill="#231F20" stroke={PALETTE.ink} strokeWidth="2" />
-            <line x1="-4" y1="-2" x2="4" y2="-2" stroke={PALETTE.ink} strokeWidth="3" />
-            <line x1="-22" y1="-2" x2="-14" y2="2" stroke="#7AE4FF" strokeWidth="1.8" opacity="0.7" />
-            <line x1="8" y1="-2" x2="16" y2="2" stroke="#C49BFF" strokeWidth="1.8" opacity="0.7" />
+        {/* Sleek Dark Sunglasses worn OVER EYES when Saturation is Maxed! */}
+        {hasSunglasses && (
+          <g
+            transform={`translate(${glassesX}, ${glassesY}) rotate(${glassesRot})`}
+            opacity={glassesOpacity}
+          >
+            {/* Temple arms */}
+            <line x1="-35" y1="-3" x2="-27" y2="-3" stroke={PALETTE.ink} strokeWidth="3.5" strokeLinecap="round" />
+            <line x1="27" y1="-3" x2="35" y2="-3" stroke={PALETTE.ink} strokeWidth="3.5" strokeLinecap="round" />
+            {/* Left & Right dark shaded lenses */}
+            <rect x="-29" y="-10" width="25" height="17" rx="5.5" fill="#18171C" stroke={PALETTE.ink} strokeWidth="2.4" />
+            <rect x="4" y="-10" width="25" height="17" rx="5.5" fill="#18171C" stroke={PALETTE.ink} strokeWidth="2.4" />
+            {/* Bridge */}
+            <path d="M -4 -4 Q 0 -7 4 -4" fill="none" stroke={PALETTE.ink} strokeWidth="3.2" strokeLinecap="round" />
+            {/* Animated cool cyan/magenta lens reflections */}
+            <line
+              x1={-24 + clamp(glintShift, -4, 14) * 0.4}
+              y1="-7"
+              x2={-15 + clamp(glintShift, -4, 14) * 0.4}
+              y2="4"
+              stroke="#7AE4FF"
+              strokeWidth="2.8"
+              strokeLinecap="round"
+              opacity="0.82"
+            />
+            <line
+              x1={9 + clamp(glintShift, -4, 14) * 0.4}
+              y1="-7"
+              x2={18 + clamp(glintShift, -4, 14) * 0.4}
+              y2="4"
+              stroke="#D29BFF"
+              strokeWidth="2.8"
+              strokeLinecap="round"
+              opacity="0.82"
+            />
+          </g>
+        )}
+
+        {/* Raised Left Arm gripping the sunglasses to put them ON / take them OFF */}
+        {leftHandHoldingGlasses && (
+          <g>
+            <path
+              d={buildArmPath(-36, 2, glassesX - 28, glassesY - 2, 10)}
+              fill="none"
+              stroke={PALETTE.ink}
+              strokeWidth="12.5"
+              strokeLinecap="round"
+            />
+            <path
+              d={buildArmPath(-36, 2, glassesX - 28, glassesY - 2, 10)}
+              fill="none"
+              stroke="#63A8FA"
+              strokeWidth="7.5"
+              strokeLinecap="round"
+            />
+            <circle
+              cx={glassesX - 28}
+              cy={glassesY - 2}
+              r="7.5"
+              fill="#7CC5FF"
+              stroke={PALETTE.ink}
+              strokeWidth="2.5"
+            />
           </g>
         )}
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import {DirectorState} from '../config/timeline';
-import {easeOutBack, FONTS, lerp, PALETTE, remap, seededRandom} from '../utils/motion';
+import {easeOutBack, FONTS, HEIGHT, lerp, PALETTE, remap, seededRandom, WIDTH} from '../utils/motion';
 import {geminiStarPath} from './Robot';
 
 export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
@@ -15,7 +15,6 @@ export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
     confettiProgress,
   } = state;
 
-  // Sticky note progressive text reveal during ending (810..885)
   const noteOpacity = remap(frame, 808, 822, 0, 1);
   const line1Chars = Math.floor(remap(frame, 816, 842, 0, 6));
   const line2Progress = remap(frame, 842, 868, 0, 1, easeOutBack);
@@ -26,9 +25,7 @@ export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
     <g>
       {/* Bouncing Trash Can during Ramen Cut */}
       {trashCanProgress > 0.02 && (
-        <g
-          transform={`translate(610, 650) scale(${trashCanProgress})`}
-        >
+        <g transform={`translate(610, 1745) scale(${trashCanProgress * 1.35})`}>
           <path
             d="M -28 -26 L 28 -26 L 22 34 L -22 34 Z"
             fill="#C7C2BA"
@@ -44,20 +41,20 @@ export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
         </g>
       )}
 
-      {/* Green Tilted Stamp ("已修正") */}
+      {/* Green Tilted Stamp ("已修正") on right side of hero phone */}
       {fixedStampProgress > 0.02 && (
         <g
-          transform={`translate(888, 224) rotate(-13) scale(${0.8 + fixedStampProgress * 0.25})`}
+          transform={`translate(868, 430) rotate(-13) scale(${0.95 + fixedStampProgress * 0.25})`}
           opacity={fixedStampProgress}
         >
-          <rect x="-92" y="-36" width="184" height="72" rx="10" fill="rgba(255,253,248,0.85)" stroke={PALETTE.greenStamp} strokeWidth="4.5" strokeDasharray="10 3" />
-          <rect x="-84" y="-28" width="168" height="56" rx="6" fill="none" stroke={PALETTE.greenStamp} strokeWidth="2" />
+          <rect x="-98" y="-38" width="196" height="76" rx="12" fill="rgba(255,253,248,0.9)" stroke={PALETTE.greenStamp} strokeWidth="5" strokeDasharray="10 3" />
+          <rect x="-88" y="-29" width="176" height="58" rx="7" fill="none" stroke={PALETTE.greenStamp} strokeWidth="2.2" />
           <text
             x="0"
             y="14"
             textAnchor="middle"
             fill={PALETTE.greenStamp}
-            fontSize="40"
+            fontSize="42"
             fontWeight="900"
             fontFamily={FONTS.comic}
             letterSpacing="6"
@@ -80,10 +77,10 @@ export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
             textAnchor="middle"
             fill={c.color}
             stroke={PALETTE.ink}
-            strokeWidth="10"
+            strokeWidth="12"
             paintOrder="stroke"
             strokeLinejoin="round"
-            fontSize="50"
+            fontSize="64"
             fontWeight="900"
             fontFamily={FONTS.comic}
           >
@@ -94,44 +91,38 @@ export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
 
       {/* Saturation Overload Screen Flash / Dim */}
       {screenFlashOpacity > 0.01 && (
-        <rect x="0" y="0" width="1280" height="720" fill="#FFF9E6" opacity={screenFlashOpacity} />
+        <rect x="0" y="0" width={WIDTH} height={HEIGHT} fill="#FFF9E6" opacity={screenFlashOpacity} />
       )}
       {screenDimOpacity > 0.01 && (
-        <rect x="0" y="0" width="1280" height="720" fill="#181615" opacity={screenDimOpacity} />
+        <rect x="0" y="0" width={WIDTH} height={HEIGHT} fill="#181615" opacity={screenDimOpacity} />
       )}
 
-      {/* Ending Taped Sticky Note on Left */}
+      {/* Vertical Ending Taped Sticky Note (bottom-left below hero phone) */}
       {endingProgress > 0.05 && noteOpacity > 0.01 && (
         <g
-          transform={`translate(226, 336) rotate(-1.6) scale(${lerp(0.92, 1, noteOpacity)})`}
+          transform={`translate(362, 1490) rotate(-1.8) scale(${lerp(0.92, 1.15, noteOpacity)})`}
           opacity={noteOpacity}
         >
-          {/* Paper shadow */}
-          <rect x="-176" y="-154" width="360" height="316" rx="10" fill="rgba(43,37,35,0.12)" />
-          {/* Sticky note sheet */}
-          <rect x="-180" y="-160" width="360" height="316" rx="8" fill="#FFFDF8" stroke={PALETTE.ink} strokeWidth="2.8" />
-          {/* Subtle ruled paper lines */}
-          {[-86, -32, 22, 76, 120].map((ly, idx) => (
-            <line key={idx} x1="-166" y1={ly} x2="166" y2={ly} stroke="#ECE7DC" strokeWidth="1.4" />
+          <rect x="-214" y="-168" width="436" height="344" rx="12" fill="rgba(43,37,35,0.13)" />
+          <rect x="-218" y="-174" width="436" height="344" rx="10" fill="#FFFDF8" stroke={PALETTE.ink} strokeWidth="3.2" />
+          {[-96, -36, 24, 84, 132].map((ly, idx) => (
+            <line key={idx} x1="-202" y1={ly} x2="202" y2={ly} stroke="#ECE7DC" strokeWidth="1.6" />
           ))}
-          {/* Top yellow masking tape */}
-          <rect x="-48" y="-172" width="96" height="24" rx="3" fill="#F2CD5C" opacity="0.88" stroke="#D1AB42" strokeWidth="1.2" />
+          <rect x="-56" y="-188" width="112" height="28" rx="4" fill="#F2CD5C" opacity="0.88" stroke="#D1AB42" strokeWidth="1.4" />
 
-          {/* Line 1: 30 秒剪完， */}
           <text
-            x="-150"
-            y="-96"
+            x="-182"
+            y="-108"
             fill={PALETTE.ink}
-            fontSize="32"
+            fontSize="36"
             fontWeight="700"
             fontFamily={FONTS.hand}
           >
             {'30 秒剪完，'.slice(0, line1Chars)}
           </text>
 
-          {/* Line 2: Gemini + Sparkle */}
           {line2Progress > 0.01 && (
-            <g transform={`translate(-8, 12) scale(${line2Progress})`}>
+            <g transform={`translate(-10, 12) scale(${line2Progress})`}>
               <defs>
                 <linearGradient id="noteGeminiGrad" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#4285F4" />
@@ -145,45 +136,43 @@ export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
                 textAnchor="middle"
                 fill="url(#noteGeminiGrad)"
                 stroke={PALETTE.ink}
-                strokeWidth="2.2"
+                strokeWidth="2.4"
                 paintOrder="stroke"
-                fontSize="68"
+                fontSize="76"
                 fontWeight="900"
                 fontFamily={FONTS.comic}
               >
                 Gemini
               </text>
               <path
-                transform="translate(128, -32)"
-                d={geminiStarPath(18)}
+                transform="translate(142, -36)"
+                d={geminiStarPath(21)}
                 fill="url(#noteGeminiGrad)"
                 stroke={PALETTE.ink}
-                strokeWidth="2.2"
+                strokeWidth="2.4"
               />
             </g>
           )}
 
-          {/* Gemini aurora hand-drawn brush underline */}
           {underlineProgress > 0.01 && (
             <path
-              d="M -146 34 Q 0 18 148 30"
+              d="M -170 36 Q 0 18 172 32"
               fill="none"
               stroke="url(#noteGeminiGrad)"
-              strokeWidth="8"
+              strokeWidth="9"
               strokeLinecap="round"
-              strokeDasharray="300"
-              strokeDashoffset={300 * (1 - underlineProgress)}
+              strokeDasharray="360"
+              strokeDashoffset={360 * (1 - underlineProgress)}
             />
           )}
 
-          {/* Signature */}
           {sigOpacity > 0.01 && (
             <text
               x="0"
-              y="108"
+              y="118"
               textAnchor="middle"
               fill={PALETTE.inkMuted}
-              fontSize="28"
+              fontSize="32"
               fontWeight="700"
               fontFamily={FONTS.hand}
               opacity={sigOpacity}
@@ -194,15 +183,15 @@ export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
         </g>
       )}
 
-      {/* Celebratory Confetti */}
+      {/* Celebratory Confetti across 1080x1920 vertical frame */}
       {confettiProgress > 0 && (
         <g>
-          {Array.from({length: 34}).map((_, i) => {
-            const colors = ['#F1C64E', '#E55A52', '#65B6A7', '#9D7BFF', '#FF85A1'];
-            const startX = 1150 + (seededRandom(i * 19 + 1) - 0.5) * 420;
-            const startY = 20 + seededRandom(i * 23 + 2) * 80;
-            const vx = (seededRandom(i * 31 + 3) - 0.55) * 320;
-            const vy = 120 + seededRandom(i * 37 + 4) * 520;
+          {Array.from({length: 42}).map((_, i) => {
+            const colors = ['#4285F4', '#8B6CF6', '#67D9F6', '#F1C64E', '#FF85A1'];
+            const startX = 920 + (seededRandom(i * 19 + 1) - 0.65) * 680;
+            const startY = 40 + seededRandom(i * 23 + 2) * 180;
+            const vx = (seededRandom(i * 31 + 3) - 0.55) * 420;
+            const vy = 260 + seededRandom(i * 37 + 4) * 1450;
             const cx = startX + vx * confettiProgress;
             const cy = startY + vy * confettiProgress;
             const rot = (seededRandom(i * 41 + 5) * 360 + confettiProgress * 540) % 360;
@@ -212,12 +201,12 @@ export const EffectsOverlay: React.FC<{state: DirectorState}> = ({state}) => {
                 key={i}
                 x={cx}
                 y={cy}
-                width={i % 2 === 0 ? 11 : 8}
-                height={i % 2 === 0 ? 6 : 8}
-                rx="1.5"
+                width={i % 2 === 0 ? 15 : 11}
+                height={i % 2 === 0 ? 8 : 11}
+                rx="2"
                 fill={colors[i % colors.length]}
                 stroke={PALETTE.ink}
-                strokeWidth="1.2"
+                strokeWidth="1.5"
                 opacity={alpha}
                 transform={`rotate(${rot} ${cx} ${cy})`}
               />
